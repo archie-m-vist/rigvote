@@ -8,6 +8,7 @@ class RankedPairsCalculator:
       super().__init__(*args,**kwargs)
       self.poller = poller
       self.pairs = []
+      self.weights = {}
 
    def rankPairs (self):
       """
@@ -24,6 +25,8 @@ class RankedPairsCalculator:
       matrix = self.poller.voteMatrix()
       # reverse=true to indicate descending sort
       self.pairs.sort(key=lambda pair: key(matrix,pair), reverse=True)
+      self.weights = { pair : key(matrix,pair) for pair in self.pairs }
+      self.pairs = [pair for pair in self.pairs if self.weights[pair][0] > -1*self.weights[pair][1]]
 
    def getSingleWinner (self):
       self.rankPairs()
@@ -33,10 +36,10 @@ class RankedPairsCalculator:
       for pair in self.pairs:
          try:
             graph.addEdge(*pair)
-            print("Added edge ({} -> {}) to graph.".format(*pair))
+            print("Added edge ({} -> {}) to graph ({} for, {} against).".format(*pair,self.weights[pair][0], -1*self.weights[pair][1]))
          # ignore edges which would create a cycle
          except CycleException:
-            print("Edge ({} -> {}) would create a cycle, skipping.".format(*pair))
+            print("Edge ({} -> {}) would create a cycle, skipping ({} for, {} against).".format(*pair,self.weights[pair][0], -1*self.weights[pair][1]))
       roots = graph.roots()
       return roots if len(roots) > 1 else roots.pop()
 
@@ -52,10 +55,11 @@ class RankedPairsCalculator:
          for pair in self.pairs:
             try:
                graph.addEdge(*pair)
-               print("Added edge ({} -> {}) to graph.".format(*pair))
+               print("Added edge ({} -> {}) to graph ({} for, {} against).".format(*pair,self.weights[pair][0], -1*self.weights[pair][1]))
             # ignore edges which would create a cycle
             except CycleException:
-               print("Edge ({} -> {}) would create a cycle, skipping.".format(*pair))
+               print("Edge ({} -> {}) would create a cycle, skipping ({} for, {} against).".format(*pair,self.weights[pair][0], -1*self.weights[pair][1]))
+               continue;
          roots = graph.roots()
          winner = roots if len(roots) > 1 else roots.pop()
          # note winner in output
@@ -66,6 +70,17 @@ class RankedPairsCalculator:
          # remove pairs involving the winner from the ranking
          self.pairs = [x for x in self.pairs if winner not in x]
       return output
+
+   def detailedResults (self):
+      lst = self.getOrderedList()
+      for i in range(len(lst)):
+         print("{}: {}".format(i+1,lst[i]))
+         for j in range(i+1,len(lst)):
+            try:
+               weight = self.weights[(lst[i],lst[j])]
+            except:
+               continue
+            print("   versus {}: {} for, {} against".format(lst[j],weight[0],-1*weight[1]))
 
 def main ():
    if len(sys.argv) == 1 or sys.argv[1] == "test":
@@ -83,12 +98,14 @@ def main ():
       votes = votes[:-1]
       poller = SerialPoller(candidates=candidates,data=votes)
       calc = RankedPairsCalculator(poller)
-      print(calc.getOrderedList())
+      calc.detailedResults()
    else:
       filetype = os.path.splitext(sys.argv[1])[1][1:]
       poller = pollers[filetype](filename=sys.argv[1])
       calc = RankedPairsCalculator(poller)
-      print(calc.getOrderedList())
+      calc.detailedResults()
+
+      input("Press Enter to continue.")
 
 
 

@@ -116,7 +116,8 @@ class Poller:
       self.votes = []
 
    def __str__(self):
-      return "\n".join(list(self.candidates) + [str(vote) for vote in self.votes])
+      clist = " ".join([str(x) for x in self.candidates])
+      return clist+"\n".join([str(vote) for vote in self.votes])
 
    def __repr__ (self):
       return "SerialPoller(data='{}')".format(str(self))
@@ -184,8 +185,14 @@ class SerialPoller (Poller):
       Note that this class does not include a Vote implementation; SerialVote is made available in the main module.
    """
 
-   def __init__ (self, data, *args, **kwargs):
+   def __init__ (self, filename=None, data=None, *args, **kwargs):
       super().__init__(*args, **kwargs)
+      if data is None:
+         if filename is None:
+            raise ValueError("Must provide either string data or filename for SerialPoller.")
+         temp = rawdata.split("\n")
+         candidates = temp[0].split(" ")
+
       for line in data.split("\n"):
          self.votes.append(SerialVote(candidates=self.candidates,data=line))
 
