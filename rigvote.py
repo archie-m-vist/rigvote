@@ -80,7 +80,9 @@ class RankedPairsCalculator:
                weight = self.weights[(lst[i],lst[j])]
             except:
                continue
-            print("   versus {}: {} for, {} against".format(lst[j],weight[0],-1*weight[1]))
+            percent = '%.1f' % round(100*weight[0]/(weight[0]-weight[1]),1)
+            print("   versus {}: {} for, {} against ({}%)".format(lst[j],weight[0],-1*weight[1],percent))
+         print()
 
 def main ():
    if len(sys.argv) == 1 or sys.argv[1] == "test":
@@ -105,7 +107,7 @@ def main ():
       calc = RankedPairsCalculator(poller)
       calc.detailedResults()
 
-      input("Press Enter to continue.")
+   temp = input("Press Enter to continue.")
 
 
 
