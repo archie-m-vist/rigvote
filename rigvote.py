@@ -85,7 +85,7 @@ class RankedPairsCalculator:
          print()
 
 def main ():
-   if len(sys.argv) == 1 or sys.argv[1] == "test":
+   if len(sys.argv) == 1 or sys.argv[1] == "test1":
       print("Running Wikipedia example.")
       candidates = ["M","N","C","K"]
       votes = ""
@@ -99,6 +99,20 @@ def main ():
          votes += "K>C>N>M\n"
       votes = votes[:-1]
       poller = SerialPoller(candidates=candidates,data=votes)
+      calc = RankedPairsCalculator(poller)
+      calc.detailedResults()
+   elif sys.argv[1] == "test2":
+      print("Running cycle test.")
+      votes = "A>B"
+      candidates = ["A","B","C"]
+      for i in range(79):
+         votes += "\nA>B"
+      for i in range(70):
+         votes += "\nB>C"
+      for i in range(60):
+         votes += "\nC>A"
+      poller = SerialPoller(candidates=candidates,data=votes)
+      print(poller.candidates)
       calc = RankedPairsCalculator(poller)
       calc.detailedResults()
    else:
