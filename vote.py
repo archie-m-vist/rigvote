@@ -153,10 +153,11 @@ class SerialVote (Vote):
       
       These shouldn't be invoked directly, instead simply pulling from a Vote object.
    """
-   def __init__ (self, candidates, data, *args, **kwargs):
+   def __init__ (self, data, candidates = None, *args, **kwargs):
       # serialvote allows for absent candidates, so figure out who the vote actually mentions
       votes = data.split(">")
-      candidates = self.candidatesInVote(votes)
+      if candidates is None:
+         candidates = self.candidatesInVote(votes)
       super().__init__(*args, candidates=candidates, **kwargs)
       temp=set(self.candidates)
       for vote in votes:
