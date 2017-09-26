@@ -80,7 +80,10 @@ class RankedPairsCalculator:
                weight = self.weights[(lst[i],lst[j])]
             except:
                continue
-            percent = '%.1f' % round(100*weight[0]/(weight[0]-weight[1]),1)
+            if weight[0] >= -1*weight[1]:
+               percent = '+'+'%.1f' % round(100*weight[0]/(weight[0]-weight[1]),1)
+            else:
+               percent = '%.1f' % round(100*weight[1]/(weight[0]-weight[1]),1)
             print("   versus {}: {} for, {} against ({}%)".format(lst[j],weight[0],-1*weight[1],percent))
          print()
 
