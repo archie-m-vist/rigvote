@@ -61,14 +61,21 @@ class RankedPairsCalculator:
                print("Edge ({} -> {}) would create a cycle, skipping ({} for, {} against).".format(*pair,self.weights[pair][0], -1*self.weights[pair][1]))
                continue;
          roots = graph.roots()
-         winner = roots if len(roots) > 1 else roots.pop()
-         # note winner in output
-         output.append(winner)
-         print("Place {}: {}\n".format(len(output), winner))
-         # remove winner from list of candidates
-         candidates.remove(winner)
-         # remove pairs involving the winner from the ranking
-         self.pairs = [x for x in self.pairs if winner not in x]
+         if len(roots) > 1:
+            winner = roots
+            output.append(winner)
+            print("Place {}: Tie {}".format(len(output), ", ".join(winner)))
+            for item in winner:
+               candidates.remove(item)
+         else:
+            winner = roots.pop()
+            # note winner in output
+            output.append(winner)
+            print("Place {}: {}\n".format(len(output), winner))
+            # remove winner from list of candidates
+            candidates.remove(winner)
+            # remove pairs involving the winner from the ranking
+            self.pairs = [x for x in self.pairs if winner not in x]
       return output
 
    def detailedResults (self):
